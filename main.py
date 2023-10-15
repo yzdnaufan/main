@@ -1,16 +1,26 @@
 import os
 import dotenv
+
 from fastapi import FastAPI, Request
+from pydantic import BaseModel
 
 from models.post_body import Phone
 from controller.query import (get_first_4_users, 
                               verify_phone
                               )         
-from src.agent.agent import AgentFactory          
+from src.agent.agent import AgentFactory   
+
+from agent.agent import (get_chat_response,
+                         get_llm_response,
+                         get_basic_economy_response)
 
 dotenv.load_dotenv(".env")
 
 app = FastAPI()
+
+class Message(BaseModel):
+    message: str
+
 
 def get_data():
     p = os.getenv("FS_DATABASE_URL")
@@ -46,6 +56,26 @@ def root(phone: Phone):
     else:
         return {"message": "Your phone is not on our database"}
 
+
+@app.post("/chat")
+def root(message: Message):
+    t = message.message
+    return {"message": str(get_chat_response(t))}
+
+@app.post("/llm")
+def root(message: Message):
+    t = message.message
+    return {"message": str(get_llm_response(t))}
+
+@app.post("/hello")
+def root(message: Message):
+    return {"message": "Hello " + message.message}
+
+@app.post("/econ")
+def root(message: Message):
+    t = message.message
+    
+    return {"message": get_basic_economy_response(t).content }
 #
 # Start of GET route
 # code
@@ -62,3 +92,4 @@ def root(item_id: int):
 @app.get("/first-user")
 async def root():
     return await get_first_4_users()
+
