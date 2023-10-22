@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from langchain.llms import OpenAI
+from langchain.chains.router import MultiRetrievalQAChain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain.schema import (
@@ -10,6 +11,8 @@ from langchain.schema import (
     SystemMessage,
     HumanMessage
 )
+
+from .retriever.MarketingRetriever import retriever_infos
 
 load_dotenv()
 
@@ -32,6 +35,10 @@ def get_chat_response(message):
     return chat_model.predict(message)
 
 def get_basic_economy_response(message):
-
     chain = template.format_messages(text=message)
     return llm.predict_messages(chain)
+
+def get_marketing_response(message):
+    chain = MultiRetrievalQAChain.from_retrievers(OpenAI(), retriever_infos, verbose=True)
+    return chain.run(message)
+

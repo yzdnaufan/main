@@ -12,7 +12,8 @@ from src.agent.agent import AgentFactory
 
 from agent.agent import (get_chat_response,
                          get_llm_response,
-                         get_basic_economy_response)
+                         get_basic_economy_response,
+                         get_marketing_response)
 
 dotenv.load_dotenv(".env")
 
@@ -20,7 +21,6 @@ app = FastAPI()
 
 class Message(BaseModel):
     message: str
-
 
 def get_data():
     p = os.getenv("FS_DATABASE_URL")
@@ -76,6 +76,12 @@ def root(message: Message):
     t = message.message
     
     return {"message": get_basic_economy_response(t).content }
+
+@app.post("/marketing")
+def root(message: Message):
+    t = message.message
+    return {"message": get_marketing_response(t) }
+
 #
 # Start of GET route
 # code
@@ -92,4 +98,5 @@ def root(item_id: int):
 @app.get("/first-user")
 async def root():
     return await get_first_4_users()
+
 
