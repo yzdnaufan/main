@@ -26,18 +26,8 @@ for i in splits2:
 marketing_retriever = Chroma.from_documents(documents=splits,embedding=OpenAIEmbeddings()).as_retriever()
 coke_retriever = Chroma.from_documents(documents=coke,embedding=OpenAIEmbeddings()).as_retriever()
 
-retriever_infos = [
-    {
-        "name": "marketing",
-        "description": "Good for answering questions related to marketing strategy",
-        "retriever": marketing_retriever
-    },
-    {
-        "name": "coca cola marketing strategy", 
-        "description": "Good for answering questions related to marketing strategy by example of Coca Cola",
-        "retriever": coke_retriever
-    }
-]
+retriever_infos = { "marketing": marketing_retriever
+                   , "coke": coke_retriever}
 
 # Chain
 from langchain.chains.router import MultiRetrievalQAChain
@@ -48,8 +38,6 @@ from langchain.schema import (
     HumanMessage
 )
 
-chain = MultiRetrievalQAChain.from_retrievers(OpenAI(), retriever_infos, verbose=True)
-
 # # Test
 # print(chain.run("What is marketing?"))
 # print(chain.run("What is marketing strategy?"))
@@ -57,6 +45,3 @@ chain = MultiRetrievalQAChain.from_retrievers(OpenAI(), retriever_infos, verbose
 # print(chain.run("What is coca cola marketing strategy?"))
 # print(chain.run("What is coca cola marketing strategy?"))
 # print(chain.run("What is coca cola marketing strategy?"))
-
-def get_marketing_response(message):
-    return chain.run(message)

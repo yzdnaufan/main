@@ -12,8 +12,7 @@ from src.agent.agent import AgentFactory
 
 from agent.agent import (get_chat_response,
                          get_llm_response,
-                         get_basic_economy_response,
-                         get_marketing_response)
+                         get_agent_response)
 
 dotenv.load_dotenv(".env")
 
@@ -71,16 +70,11 @@ def root(message: Message):
 def root(message: Message):
     return {"message": "Hello " + message.message}
 
-@app.post("/econ")
-def root(message: Message):
-    t = message.message
-    
-    return {"message": get_basic_economy_response(t).content }
 
-@app.post("/marketing")
+@app.post("/agent")
 def root(message: Message):
     t = message.message
-    return {"message": get_marketing_response(t) }
+    return {"message": get_agent_response(t) }
 
 #
 # Start of GET route
