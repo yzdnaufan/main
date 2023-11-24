@@ -2,6 +2,7 @@ import os
 import dotenv
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from models.post_body import Phone
@@ -17,6 +18,19 @@ from agent.agent import (get_chat_response,
 dotenv.load_dotenv(".env")
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",  # adjust to match the domain of your client app
+    # "https://example.com",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["POST"],
+    allow_headers=["*"],
+)
 
 class Message(BaseModel):
     message: str
@@ -72,9 +86,10 @@ def root(message: Message):
 
 
 @app.post("/agent")
-def root(message: Message):
+async def root(message: Message):
     t = message.message
-    return {"message": get_agent_response(t) }
+    res = await get_agent_response(t)
+    return {"message":  res }
 
 #
 # Start of GET route

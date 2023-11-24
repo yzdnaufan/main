@@ -41,12 +41,12 @@ system_message = SystemMessage(
 )
 
 # Agent Memory
-memory_key = "history"
-memory = AgentTokenBufferMemory(memory_key=memory_key, llm=llm)
+# memory_key = "history"
+# memory = AgentTokenBufferMemory(memory_key=memory_key, llm=llm)
 
 prompt = OpenAIFunctionsAgent.create_prompt(
         system_message=system_message,
-        extra_prompt_messages=[MessagesPlaceholder(variable_name=memory_key)]
+        extra_prompt_messages=[SystemMessage(content="Ingat, jawab dengan bahasa indonesia dan JANGAN pernah memberikan jawaban diluar konteks bisnis, ekonomi, ataupun marketing")]
     )
 
 tools = [
@@ -67,9 +67,6 @@ tools = [
     ),
 ]
 
-agent = OpenAIFunctionsAgent(llm=llm, tools=tools, prompt=prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, memory=memory, verbose=True,
-                                   return_intermediate_steps=True)
 
 chat_model = ChatOpenAI()
 
@@ -79,7 +76,11 @@ def get_llm_response(message):
 def get_chat_response(message):
     return chat_model.predict(message)
 
-def get_agent_response(message):
-    result = agent_executor({"input" : message})
+async def get_agent_response(message):
+    agent = OpenAIFunctionsAgent(llm=llm, tools=tools, prompt=prompt)
+    agent_executor = AgentExecutor(agent=agent, tools=tools,  verbose=True,
+                                   return_intermediate_steps=True)
+
+    result =  agent_executor({"input": message}, include_run_info=True)
     return result['output']
 
