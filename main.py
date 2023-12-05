@@ -20,7 +20,8 @@ dotenv.load_dotenv(".env")
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",  # adjust to match the domain of your client app
+    "http://localhost:5173",
+    "http://localhost:3005"  # adjust to match the domain of your client app
     # "https://example.com",
 ]
 
